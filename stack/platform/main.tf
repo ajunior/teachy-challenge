@@ -30,9 +30,28 @@ resource "helm_release" "kube_prometheus_stack" {
         ruleSelectorNilUsesHelmValues           = false
       }
     }
+    grafana = {
+      additionalDataSources = [{
+        name = "Loki"
+        uid  = "loki"
+        type = "loki"
+        url  = "http://loki.monitoring:3100"
+      }]
+    }
     kubeEtcd              = { enabled = false }
     kubeScheduler         = { enabled = false }
     kubeControllerManager = { enabled = false }
     kubeProxy             = { enabled = false }
   })]
+}
+
+resource "helm_release" "loki" {
+  depends_on = [helm_release.kube_prometheus_stack]
+  name       = "loki"
+  repository = "https://grafana.github.io/helm-charts"
+  chart      = "loki"
+  version    = "7.3.0"
+  namespace  = "monitoring"
+  timeout    = 600
+  values     = [file("${path.module}/values/loki.yaml")]
 }
