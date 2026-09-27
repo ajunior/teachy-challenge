@@ -1,3 +1,5 @@
+name: teachy
+
 services:
   minio:
     image: cgr.dev/chainguard/minio@sha256:6a1d0b45c8669726bba580ced0bfa4cb9fdeed1ed636dfabd81d1577beb6937b
