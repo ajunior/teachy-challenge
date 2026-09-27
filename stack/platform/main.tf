@@ -55,3 +55,14 @@ resource "helm_release" "loki" {
   timeout    = 600
   values     = [file("${path.module}/values/loki.yaml")]
 }
+
+resource "helm_release" "tempo" {
+  depends_on = [helm_release.kube_prometheus_stack]
+  name       = "tempo"
+  repository = "https://grafana-community.github.io/helm-charts"
+  chart      = "tempo"
+  version    = "2.4.0"
+  namespace  = "monitoring"
+  timeout    = 600
+  values     = [file("${path.module}/values/tempo.yaml")]
+}
