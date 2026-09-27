@@ -22,27 +22,7 @@ resource "helm_release" "kube_prometheus_stack" {
   namespace        = "monitoring"
   create_namespace = true
   timeout          = 600
-  values = [yamlencode({
-    prometheus = {
-      prometheusSpec = {
-        serviceMonitorSelectorNilUsesHelmValues = false
-        podMonitorSelectorNilUsesHelmValues     = false
-        ruleSelectorNilUsesHelmValues           = false
-      }
-    }
-    grafana = {
-      additionalDataSources = [{
-        name = "Loki"
-        uid  = "loki"
-        type = "loki"
-        url  = "http://loki.monitoring:3100"
-      }]
-    }
-    kubeEtcd              = { enabled = false }
-    kubeScheduler         = { enabled = false }
-    kubeControllerManager = { enabled = false }
-    kubeProxy             = { enabled = false }
-  })]
+  values           = [file("${path.module}/values/prometheus.yaml")]
 }
 
 resource "helm_release" "loki" {
