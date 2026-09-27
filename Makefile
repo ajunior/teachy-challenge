@@ -4,7 +4,7 @@ export AWS_SECRET_ACCESS_KEY = $(MINIO_ROOT_PASSWORD)
 
 COMPOSE = docker compose --env-file .env -f bootstrap/compose.yaml
 
-.PHONY: minio-up minio-down cluster-up
+.PHONY: minio-up minio-down cluster-up cluster-down
 
 .env:
 	printf 'MINIO_ROOT_USER=admin\nMINIO_ROOT_PASSWORD=%s\n' "$$(openssl rand -hex 16)" > $@
@@ -19,3 +19,6 @@ minio-down:
 cluster-up: minio-up
 	tofu -chdir=stack/cluster init
 	tofu -chdir=stack/cluster apply -auto-approve
+
+cluster-down:
+	tofu -chdir=stack/cluster destroy -auto-approve
