@@ -18,6 +18,12 @@ grafana:
       uid: "loki"
       type: "loki"
       url: "http://loki.monitoring:3100"
+      jsonData:
+        derivedFields:
+          - name: TraceID
+            matcherRegex: '"trace_id":"(\w+)"'
+            datasourceUid: tempo
+            url: '${__value.raw}'
     - name: "Tempo"
       uid: tempo
       type: tempo
