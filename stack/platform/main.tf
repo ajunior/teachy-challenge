@@ -46,3 +46,13 @@ resource "helm_release" "tempo" {
   timeout    = 600
   values     = [file("${path.module}/values/tempo.yaml")]
 }
+
+resource "helm_release" "alloy" {
+  depends_on = [helm_release.loki]
+  name       = "alloy"
+  repository = "https://grafana.github.io/helm-charts"
+  chart      = "alloy"
+  version    = "1.13.0"
+  namespace  = "monitoring"
+  values     = [file("${path.module}/values/alloy.yaml")]
+}
