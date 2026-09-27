@@ -25,6 +25,10 @@ resource "helm_release" "calico_crds" {
   version    = "3.32.2"
 }
 
+locals {
+  pod_subnet = "10.244.0.0/16"
+}
+
 resource "helm_release" "calico" {
   depends_on       = [helm_release.calico_crds]
   name             = "calico"
@@ -36,7 +40,7 @@ resource "helm_release" "calico" {
   values = [yamlencode({
     installation = {
       calicoNetwork = {
-        ipPools = [{ cidr = "192.168.0.0/16" }]
+        ipPools = [{ cidr = local.pod_subnet }]
       }
     }
   })]
@@ -53,11 +57,21 @@ resource "kind_cluster" "teachy" {
     api_version = "kind.x-k8s.io/v1alpha4"
     networking {
       disable_default_cni = true
-      pod_subnet          = "192.168.0.0/16"
+      pod_subnet          = local.pod_subnet
     }
 
     node { role = "control-plane" }
     node { role = "worker" }
     node { role = "worker" }
   }
+}
+
+resource "helm_release" "metrics_server" {
+  depends_on = [helm_release.calico]
+  name       = "metrics-server"
+  repository = "https://kubernetes-sigs.github.io/metrics-server/"
+  chart      = "metrics-server"
+  version    = "3.14.0"
+  namespace  = "kube-system"
+  set        = [{ name = "args[0]", value = "--kubelet-insecure-tls" }]
 }
