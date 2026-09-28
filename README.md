@@ -146,8 +146,12 @@ works on a fresh clone with nothing else. The tag is the short commit SHA, so a
 new commit means a new rollout. Images are distroless and run as non-root.
 
 ### Pods 
-Requests and memory limits (no CPU limit, to avoid throttling), probes, non-root,
-read-only root filesystem, no privilege escalation, all capabilities dropped.
+Each container asks for a small amount of CPU and memory (requests), so the
+scheduler knows where it fits. Memory has a hard limit, so a leak kills the
+container instead of the node. CPU has no limit on purpose: a CPU limit makes
+the kernel throttle the app, which shows up as extra latency.
+
+The containers also run as a non-root user.
 
 ## What was left out and why
 
